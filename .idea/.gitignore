@@ -12,3 +12,10 @@
 docs/.obsidian/workspace
 docs/.obsidian/plugins/
 docs/.obsidian/cache
+
+target/
+*.class
+.idea/
+*.iml
+.vscode/
+*.log

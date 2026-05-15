@@ -1,0 +1,6 @@
+app:
+  name: Daily Task Orchestrator
+  version: 1.0.0
+
+logging:
+  level: DEBUG
