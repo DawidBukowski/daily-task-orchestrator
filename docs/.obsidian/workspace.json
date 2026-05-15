@@ -1,0 +1,218 @@
+{
+  "main": {
+    "id": "7019176ffd77e330",
+    "type": "split",
+    "children": [
+      {
+        "id": "250ac9fda2bd44e2",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "35f340e401b4160e",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "af02f5701380583c",
+    "type": "split",
+    "children": [
+      {
+        "id": "e3acd3aa5bf24d0a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "a85afe7f23991c1e",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "a4641e0d83b757ba",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "d1d051e5618cd0c4",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "0d6cbaeeef47b61a",
+    "type": "split",
+    "children": [
+      {
+        "id": "9a3609f04f944fd5",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "8058ae8f520def66",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "094a2d754ae2e057",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "1e0121b57a090c7f",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "a7b0c31532921d60",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "cc84ec1be5a5d611",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "35f340e401b4160e",
+  "lastOpenFiles": [
+    "2026-05-15.md",
+    "Untitled.canvas",
+    "05_Resources/External Links.md",
+    "04_Debugging/Common Issues.md",
+    "03_Code/Code Snippets.md",
+    "03_Code/Phase 1 - Project Setup.md",
+    "02_Learning Topics/Software Engineering/SOLID Principles.md",
+    "02_Learning Topics/APIs/OAuth2 Authentication.md",
+    "02_Learning Topics/Java/Interfaces & Abstraction.md",
+    "01_Architecture/Data Flow.md",
+    "01_Architecture/Layers.md",
+    "01_Architecture/System Design.md",
+    "01_Architecture/Interfaces.md",
+    "01_Architecture/Hexagonal Architecture.md",
+    "01_Architecture/Dependency Injection.md",
+    "00_Meta/BUGLOG.md",
+    "00_Meta/Claude.md",
+    "00_Meta/PROJECT.md",
+    "00_Meta/STATE.md",
+    "00_Meta/ROADMAP.md",
+    "00_Meta/REQUIREMENTS.md",
+    "02_Learning Topics/Software Engineering/Testing Strategies.md",
+    "02_Learning Topics/Software Engineering/DRY Principle.md",
+    "02_Learning Topics/Software Engineering/Separation of Concerns.md",
+    "02_Learning Topics/Software Engineering/Clean Code.md",
+    "02_Learning Topics/Software Engineering/Design Patterns.md",
+    "03_Code/Phase 7",
+    "03_Code/Phase 6",
+    "03_Code/Phase 5",
+    "03_Code/Phase 4",
+    "03_Code/Phase 3",
+    "03_Code/Phase 2",
+    "03_Code/Phase 1",
+    "05_Resources",
+    "04_Debugging",
+    "03_Code"
+  ]
+}
