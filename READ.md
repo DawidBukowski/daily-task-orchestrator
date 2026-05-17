@@ -8,6 +8,9 @@ A foundational Java application that fetches tasks from various sources, analyze
 
 ## Build and Run Instructions
 
-**1. Clean and build the project**
-```bash
-mvn clean package
+# run tests
+- mvn test
+# execute the application
+- mvn --% exec:java -Dexec.mainClass=com.dailytask.Main
+# run specific test
+- mvn test -Dtest=DailyTsaskOrchestratorTest
