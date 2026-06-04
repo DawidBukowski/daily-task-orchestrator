@@ -7,13 +7,13 @@ class DailyTaskOrchestratorTest {
     @Test
     void shouldExecuteFullWorkflow() {
         // Arrange
-        when(mockDataSource.fetch(any())).thenReturn(mockRawData);
+        when(mockDataSource.fetch(any(Instant.class))).thenReturn(testData);
         
         // Act
         orchestrator.execute();
         
         // Assert
-        verify(mockDataSource, times(1)).fetch(any());
+        verify(mockDataSource, times(1)).fetch(any(Instant.class));
     }
 }
 ```

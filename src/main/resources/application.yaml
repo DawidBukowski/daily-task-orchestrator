@@ -2,6 +2,14 @@ app:
   name: Daily Task Orchestrator
   version: 1.0.0
 
+gmail:
+  client-id: ${GMAIL_CLIENT_ID}
+  client-secret: ${GMAIL_CLIENT_SECRET}
+  redirect-uri: http://localhost:8888/Callback
+  token-directory: ~/.dailytask/gmail_tokens
+  scopes:
+    - https://www.googleapis.com/auth/gmail.readonly
+    - https://www.googleapis.com/auth/gmail.modify
+
 logging:
   level: INFO
-  pattern: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

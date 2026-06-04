@@ -42,7 +42,7 @@ class DailyTaskOrchestratorTest {
         List<RawData> mockRawTasks = List.of(TestDataBuilder.buildRawData());
         TasksSummary mockSummarized = TestDataBuilder.buildSummarizedTasks();
 
-        when(mockDataSource.fetch(Instant.now().minusSeconds(24 * 60 * 60))).thenReturn(mockRawTasks);
+        when(mockDataSource.fetch(any(Instant.class))).thenReturn(List.of());
         when(mockDataSource.getName()).thenReturn("MockSource");
         when(mockSummarizer.summarize(any())).thenReturn(mockSummarized);
 
@@ -50,7 +50,7 @@ class DailyTaskOrchestratorTest {
         orchestrator.execute();
 
         // Assert
-        verify(mockDataSource, times(1)).fetch(Instant.now().minusSeconds(24 * 60 * 60));
+        verify(mockDataSource, times(1)).fetch(any(Instant.class));
         verify(mockSummarizer, times(1)).summarize(anyList());
         verify(mockNotifier, times(1)).notify(mockSummarized);
     }

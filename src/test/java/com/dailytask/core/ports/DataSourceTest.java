@@ -24,10 +24,12 @@ class DataSourceTest {
     void testDataSourceContract() {
         List<RawData> mockData = List.of(TestDataBuilder.buildRawData());
 
-        when(dataSource.fetch(Instant.now().minusSeconds(24 * 60 * 60))).thenReturn(mockData);
+        Instant targetTime = Instant.now().minusSeconds(24 * 60 * 60); // <-- Zmienna lokalna
+
+        when(dataSource.fetch(targetTime)).thenReturn(mockData);
         when(dataSource.getName()).thenReturn("MockSource");
 
-        List<RawData> result = dataSource.fetch(Instant.now().minusSeconds(24 * 60 * 60));
+        List<RawData> result = dataSource.fetch(targetTime);
 
         assertNotNull(result);
         assertEquals(1, result.size());

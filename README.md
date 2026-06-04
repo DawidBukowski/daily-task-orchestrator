@@ -15,9 +15,8 @@ Daily Task Orchestrator is a task management system designed to help you organiz
 
 ## Requirements
 
-- Java 8 or higher
+- Java 21
 - Maven 3.6 or higher (if using Maven)
-- Gradle 6.0 or higher (if using Gradle)
 
 ## Installation
 
@@ -35,22 +34,12 @@ Using Maven:
 mvn clean install
 ```
 
-Using Gradle:
-```bash
-gradle clean build
-```
-
 ## Usage
 
 ### Running the Application
 
 ```bash
 java -jar target/daily-task-orchestrator.jar
-```
-
-Or with Gradle:
-```bash
-gradle run
 ```
 
 ## Project Structure
@@ -62,18 +51,24 @@ daily-task-orchestrator/
 │   │   └── java/
 │   └── test/
 │       └── java/
-├── pom.xml (Maven) or build.gradle (Gradle)
+├── pom.xml (Maven)
 └── README.md
 ```
 
-## Contributing
+## Gmail API Integration Setup
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+This project uses the official Google Gmail API to fetch raw emails.
 
-## License
+### 1. Configure Credentials
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. Create a new project or select an existing one.
+3. Enable the **Gmail API** in "APIs & Services".
+4. Go to **Credentials** -> Create Credentials -> **OAuth client ID**.
+5. Application type: **Desktop app** (or Web application with redirect URI `http://localhost:8888/Callback`).
+6. Copy your Client ID and Client Secret.
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Contact
-
-For more information, visit: [https://github.com/Alucart558/daily-task-orchestrator](https://github.com/Alucart558/daily-task-orchestrator)
+### 2. Environment Variables
+Export the credentials before running the application:
+```bash
+export GMAIL_CLIENT_ID="your-client-id"
+export GMAIL_CLIENT_SECRET="your-client-secret"
