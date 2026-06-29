@@ -36,7 +36,7 @@ public class GmailOAuth2Handler {
             details.setClientSecret(config.getClientSecret());
 
             GoogleClientSecrets clientSecrets = new GoogleClientSecrets();
-            clientSecrets.setWeb(details);
+            clientSecrets.setInstalled(details);
 
             File tokenFolder = new File(config.getTokenDirectory());
             if (!tokenFolder.exists() && !tokenFolder.mkdirs()) {
