@@ -2,6 +2,7 @@ package com.dailytask;
 
 import com.dailytask.core.config.AppConfig;
 import com.dailytask.core.ports.DataSource;
+import com.dailytask.core.ports.TaskExtractor;
 import com.dailytask.core.ports.TaskSummarizer;
 import com.dailytask.core.ports.TaskNotifier;
 import com.dailytask.core.usecases.DailyTaskOrchestrator;
@@ -18,10 +19,11 @@ public class Main {
 
         try {
             List<DataSource> sources = AppConfig.createDataSources();
+            TaskExtractor extractor = AppConfig.createTaskExtractor();
             TaskSummarizer analyzer = AppConfig.createAnalyzer();
             TaskNotifier notifier = AppConfig.createNotifier();
 
-            DailyTaskOrchestrator orchestrator = new DailyTaskOrchestrator(sources, analyzer, notifier);
+            DailyTaskOrchestrator orchestrator = new DailyTaskOrchestrator(sources, extractor, analyzer, notifier);
 
             orchestrator.execute();
 

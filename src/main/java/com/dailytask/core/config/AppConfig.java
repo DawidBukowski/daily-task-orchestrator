@@ -1,12 +1,14 @@
 package com.dailytask.core.config;
 
 import com.dailytask.adapters.analyzers.ClaudeTasksSummarizer;
+import com.dailytask.adapters.analyzers.SimpleTaskExtractor;
 import com.dailytask.adapters.datasources.GmailDataSource;
 import com.dailytask.adapters.datasources.gmail.EmailFilter;
 import com.dailytask.adapters.datasources.gmail.EmailToRawDataConverter;
 import com.dailytask.adapters.datasources.gmail.GmailMessageParser;
 import com.dailytask.adapters.notifiers.EmailTaskNotifier;
 import com.dailytask.core.ports.DataSource;
+import com.dailytask.core.ports.TaskExtractor;
 import com.dailytask.core.ports.TaskSummarizer;
 import com.dailytask.core.ports.TaskNotifier;
 import com.dailytask.adapters.datasources.gmail.GmailApiClient;
@@ -53,6 +55,10 @@ public class AppConfig {
 
         // 5. Wstrzyknij wszystkie 5 zależności do adaptera i go zwróć
         return List.of(new GmailDataSource(apiClient, emailFilter, messageParser, rawDataConverter, queryLimit));
+    }
+
+    public static TaskExtractor createTaskExtractor() {
+        return new SimpleTaskExtractor();
     }
 
     public static TaskSummarizer createAnalyzer() {

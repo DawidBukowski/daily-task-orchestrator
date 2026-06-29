@@ -14,4 +14,3 @@ public class ClaudeRawDataAnalyzer implements TaskExtractor {
 * `implements TaskExtractor`: Gwarantuje, że klasa posiada metodę `extract`.
 * `rawData.size()`: Zlicza ile surowych rekordów przyszło z portów danych.
 * `return new ArrayList<>()`: To jest zaślepka (`dummy/stub`) — prawdziwa implementacja pojawi się później, gdy podepniemy Claude API.
-```

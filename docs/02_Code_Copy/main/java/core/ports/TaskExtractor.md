@@ -8,4 +8,3 @@ public interface TaskExtractor {
 * **Wejście:** `List<RawData>` — lista surowych danych pobranych z Gmaila lub stron profesorów.
 * **Wyjście:** `List<Task>` — już znormalizowane zadania, które można dalej analizować i podsumowywać.
 * Ten port oddziela pobieranie danych od ich interpretacji, dzięki czemu łatwiej podmienić logikę z reguł na Claude AI.
-```

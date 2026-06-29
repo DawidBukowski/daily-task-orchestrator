@@ -13,6 +13,12 @@ Daily Task Orchestrator is a task management system designed to help you organiz
 - **Task Orchestration**: Coordinate multiple tasks efficiently
 - **Progress Tracking**: Monitor task execution and completion status
 
+## 📚 Documentation
+
+For detailed implementation documentation, see:
+- **[Phase 3 Implementation Summary](PHASE3_IMPLEMENTATION_SUMMARY.md)** - Task domain model, normalization pipeline, deadline parsing (6 formats), title extraction
+- **[Architecture Guide](docs/01_Architecture/Architecture.md)** - Step-by-step execution flow, hexagonal architecture, dependency injection
+
 ## Requirements
 
 - Java 21
