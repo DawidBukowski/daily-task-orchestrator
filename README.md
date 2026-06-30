@@ -15,7 +15,12 @@ Daily Task Orchestrator is a task management system designed to help you organiz
 
 ## 📚 Documentation
 
-For detailed implementation documentation, see:
+### Claude Integration Documentation
+- **[CLAUDE.md](CLAUDE.md)** - Complete guide for Claude integration setup, configuration, development guidelines, and agent dispatch protocol
+- **[docs/CLAUDE_ARCHITECTURE.md](docs/CLAUDE_ARCHITECTURE.md)** - Deep dive into hexagonal architecture, component relationships, Claude provider flow, and testing strategies
+- **[docs/CLAUDE_TROUBLESHOOTING.md](docs/CLAUDE_TROUBLESHOOTING.md)** - Common issues, solutions, error diagnosis, and quick reference
+
+### Project Implementation Documentation
 - **[Phase 3 Implementation Summary](PHASE3_IMPLEMENTATION_SUMMARY.md)** - Task domain model, normalization pipeline, deadline parsing (6 formats), title extraction
 - **[Architecture Guide](docs/01_Architecture/Architecture.md)** - Step-by-step execution flow, hexagonal architecture, dependency injection
 
@@ -60,6 +65,119 @@ daily-task-orchestrator/
 ├── pom.xml (Maven)
 └── README.md
 ```
+
+## Claude Setup
+
+The application integrates with Claude AI for task summarization through **two provider modes**:
+
+### Option 1: Direct Anthropic API (Recommended for Development)
+
+**Quick Start:**
+```bash
+export CLAUDE_PROVIDER=ANTHROPIC
+export CLAUDE_MODEL_ID=claude-3-5-sonnet-20241022
+export ANTHROPIC_API_KEY=sk-ant-api03-...
+```
+
+**Key Features:**
+- Simple setup, no additional infrastructure
+- Direct API access with predictable latency
+- Best for development and testing
+
+**Get Your API Key:**
+1. Visit [console.anthropic.com](https://console.anthropic.com/)
+2. Navigate to API Keys
+3. Create a new key and copy it
+
+**Recommended Models:**
+- `claude-3-5-sonnet-20241022` - Best balance of cost and capability
+- `claude-3-opus-20240229` - Maximum intelligence
+- `claude-3-haiku-20240307` - Fastest, most economical
+
+### Option 2: AWS Bedrock (Recommended for Production)
+
+**Quick Start:**
+```bash
+export CLAUDE_PROVIDER=AWS_BEDROCK
+export CLAUDE_MODEL_ID=anthropic.claude-3-5-sonnet-20241022-v2:0
+export AWS_REGION=us-east-1
+# AWS credentials via environment variables or ~/.aws/credentials
+```
+
+**Key Features:**
+- Enterprise-grade security with IAM roles
+- Works with existing AWS infrastructure
+- Audit logging via CloudTrail
+
+**Setup Steps:**
+1. Create IAM user with `bedrock:InvokeModel` permission
+2. Set AWS region (us-east-1, us-west-2, eu-west-1, etc.)
+3. Request model access in AWS Bedrock console
+4. Configure AWS credentials
+
+**AWS Credentials:**
+```bash
+# Option A: Environment variables
+export AWS_ACCESS_KEY_ID=your_key
+export AWS_SECRET_ACCESS_KEY=your_secret
+
+# Option B: Credentials file (~/.aws/credentials)
+# Option C: IAM role (when running on EC2/ECS/Lambda)
+```
+
+### Optional Configuration
+
+Both providers support these environment variables:
+
+```bash
+# Response size (default: 1000)
+export CLAUDE_MAX_TOKENS=2000
+
+# Response randomness 0.0-1.0 (default: 0.3)
+export CLAUDE_TEMPERATURE=0.5
+
+# Request timeout in seconds (default: 30)
+export CLAUDE_TIMEOUT_SECONDS=60
+```
+
+### Key Features
+
+- **Graceful Fallback** - If Claude is unavailable, the application logs the error and continues
+- **Timeout Handling** - Configurable timeouts prevent hanging requests
+- **Secure** - No sensitive data logged, API keys in environment only
+- **Flexible** - Switch providers by changing one environment variable
+
+### Testing Your Configuration
+
+```bash
+# Build the project
+mvn clean package
+
+# Run with environment variables
+export CLAUDE_PROVIDER=ANTHROPIC
+export CLAUDE_MODEL_ID=claude-3-5-sonnet-20241022
+export ANTHROPIC_API_KEY=your-key
+java -jar target/daily-task-orchestrator.jar
+```
+
+Check logs for:
+```
+INFO  c.d.c.c.AppConfig - Initializing Claude API client with provider: ANTHROPIC
+INFO  c.d.c.c.AppConfig - Using direct Anthropic API client
+```
+
+### Complete Claude Documentation
+
+For detailed information including:
+- All environment variables
+- Error handling and troubleshooting
+- Adding new providers
+- Security best practices
+- Cost optimization
+
+See **[CLAUDE.md](CLAUDE.md)** in the project root.
+
+---
 
 ## Gmail API Integration Setup
 
