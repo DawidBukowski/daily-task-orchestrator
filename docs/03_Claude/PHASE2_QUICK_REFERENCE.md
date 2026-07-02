@@ -486,7 +486,7 @@ ERROR - Claude API call failed: [reason]
 
 ## Contact & Support
 
-**Documentation:** See `PHASE2_CLAUDE_INTEGRATION_SUMMARY.md` for detailed implementation docs
+**Documentation:** See `../00_Meta/PHASE2_CLAUDE_INTEGRATION_SUMMARY.md` for detailed implementation docs
 
 **Test Reports:** Check `target/surefire-reports/` after running tests
 

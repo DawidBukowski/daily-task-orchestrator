@@ -17,11 +17,11 @@ Daily Task Orchestrator is a task management system designed to help you organiz
 
 ### Claude Integration Documentation
 - **[CLAUDE.md](CLAUDE.md)** - Complete guide for Claude integration setup, configuration, development guidelines, and agent dispatch protocol
-- **[docs/CLAUDE_ARCHITECTURE.md](docs/CLAUDE_ARCHITECTURE.md)** - Deep dive into hexagonal architecture, component relationships, Claude provider flow, and testing strategies
-- **[docs/CLAUDE_TROUBLESHOOTING.md](docs/CLAUDE_TROUBLESHOOTING.md)** - Common issues, solutions, error diagnosis, and quick reference
+- **[docs/03_Claude/ARCHITECTURE.md](docs/03_Claude/ARCHITECTURE.md)** - Deep dive into hexagonal architecture, component relationships, Claude provider flow, and testing strategies
+- **[docs/03_Claude/TROUBLESHOOTING.md](docs/03_Claude/TROUBLESHOOTING.md)** - Common issues, solutions, error diagnosis, and quick reference
 
 ### Project Implementation Documentation
-- **[Phase 3 Implementation Summary](PHASE3_IMPLEMENTATION_SUMMARY.md)** - Task domain model, normalization pipeline, deadline parsing (6 formats), title extraction
+- **[Phase 3 Implementation Summary](docs/00_Meta/PHASE3_IMPLEMENTATION_SUMMARY.md)** - Task domain model, normalization pipeline, deadline parsing (6 formats), title extraction
 - **[Architecture Guide](docs/01_Architecture/Architecture.md)** - Step-by-step execution flow, hexagonal architecture, dependency injection
 
 ## Requirements

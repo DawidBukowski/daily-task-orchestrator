@@ -686,10 +686,10 @@ with database persistence and streaming
 ## Related Documentation
 
 - **[README.md](README.md)** - Quick start guide and project overview
-- **[CLAUDE_API_SETUP.md](CLAUDE_API_SETUP.md)** - Detailed API setup (reference, some may be outdated)
-- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** - Hexagonal architecture details
-- **[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)** - Common issues and solutions
-- **[PHASE3_IMPLEMENTATION_SUMMARY.md](PHASE3_IMPLEMENTATION_SUMMARY.md)** - Task domain model implementation
+- **[docs/03_Claude/API_SETUP.md](docs/03_Claude/API_SETUP.md)** - Detailed API setup (reference, some may be outdated)
+- **[docs/03_Claude/ARCHITECTURE.md](docs/03_Claude/ARCHITECTURE.md)** - Hexagonal architecture details
+- **[docs/03_Claude/TROUBLESHOOTING.md](docs/03_Claude/TROUBLESHOOTING.md)** - Common issues and solutions
+- **[docs/00_Meta/PHASE3_IMPLEMENTATION_SUMMARY.md](docs/00_Meta/PHASE3_IMPLEMENTATION_SUMMARY.md)** - Task domain model implementation
 
 ---
 
@@ -732,4 +732,3 @@ When contributing Claude-related changes:
 4. Use meaningful commit messages explaining the "why"
 5. Never skip hooks with `--no-verify`
 6. Keep secrets out of code and tests
-
