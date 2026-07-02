@@ -144,4 +144,38 @@ class TaskTest {
         task.setNotes("New notes");
         assertEquals("New notes", task.getNotes());
     }
+
+    @Test
+    void getGmailLink_withOriginalId_returnsGmailUrl() {
+        Task task = new Task(
+                "1", "Test", "Description", LocalDateTime.now(),
+                Priority.MEDIUM, "Gmail", "18f3c4a5b2d8e9f1", TaskStatus.PENDING,
+                null, null, LocalDateTime.now(), LocalDateTime.now(), null
+        );
+
+        String gmailLink = task.getGmailLink();
+        assertEquals("https://mail.google.com/mail/u/0/#inbox/18f3c4a5b2d8e9f1", gmailLink);
+    }
+
+    @Test
+    void getGmailLink_withNullOriginalId_returnsNull() {
+        Task task = new Task(
+                "1", "Test", "Description", LocalDateTime.now(),
+                Priority.MEDIUM, "Manual", null, TaskStatus.PENDING,
+                null, null, LocalDateTime.now(), LocalDateTime.now(), null
+        );
+
+        assertNull(task.getGmailLink());
+    }
+
+    @Test
+    void getGmailLink_withBlankOriginalId_returnsNull() {
+        Task task = new Task(
+                "1", "Test", "Description", LocalDateTime.now(),
+                Priority.MEDIUM, "Manual", "   ", TaskStatus.PENDING,
+                null, null, LocalDateTime.now(), LocalDateTime.now(), null
+        );
+
+        assertNull(task.getGmailLink());
+    }
 }

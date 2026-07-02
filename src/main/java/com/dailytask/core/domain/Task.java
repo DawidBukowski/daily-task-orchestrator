@@ -96,6 +96,18 @@ public class Task {
         return ChronoUnit.DAYS.between(LocalDateTime.now(), deadline);
     }
 
+    /**
+     * Constructs Gmail web URL to view the original email message.
+     *
+     * @return Gmail URL if originalId is present, null otherwise
+     */
+    public String getGmailLink() {
+        if (originalId == null || originalId.isBlank()) {
+            return null;
+        }
+        return "https://mail.google.com/mail/u/0/#inbox/" + originalId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
