@@ -176,6 +176,10 @@ public class EmailConfiguration {
     public boolean isEnableAuth() { return enableAuth; }
     public int getTimeoutMs() { return timeoutMs; }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder {
         private String smtpHost;
         private int smtpPort = 587;

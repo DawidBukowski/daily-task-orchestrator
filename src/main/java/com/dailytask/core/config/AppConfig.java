@@ -5,7 +5,7 @@ import com.dailytask.adapters.datasources.GmailDataSource;
 import com.dailytask.adapters.datasources.gmail.EmailFilter;
 import com.dailytask.adapters.datasources.gmail.EmailToRawDataConverter;
 import com.dailytask.adapters.datasources.gmail.GmailMessageParser;
-import com.dailytask.adapters.notifiers.EmailTaskNotifier;
+import com.dailytask.adapters.notifiers.*;
 import com.dailytask.core.ports.ClaudeApiClient;
 import com.dailytask.core.ports.DataSource;
 import com.dailytask.core.ports.TaskExtractor;
@@ -98,6 +98,25 @@ public class AppConfig {
     }
 
     public static TaskNotifier createNotifier() {
-        return new EmailTaskNotifier();
+        try {
+            // 1. Load and validate configuration (fail-fast)
+            EmailConfiguration config = EmailConfiguration.fromEnv();
+            logger.info("Email notifier initialized: SMTP {}:{}, recipient: {}",
+                config.getSmtpHost(), config.getSmtpPort(), config.getToEmail());
+
+            // 2. Build dependency graph (bottom-up)
+            PriorityColorScheme colorScheme = new PriorityColorScheme();
+            HtmlContentBuilder htmlBuilder = new HtmlContentBuilder(colorScheme);
+            EmailTemplate emailTemplate = new EmailTemplate(htmlBuilder);
+            SmtpEmailSender emailSender = new SmtpEmailSender(config);
+
+            // 3. Wire into port adapter
+            return new EmailTaskNotifier(config, emailTemplate, emailSender);
+
+        } catch (IllegalStateException e) {
+            // Configuration validation failed
+            logger.error("Email notifier configuration failed: {}", e.getMessage());
+            throw e; // Re-throw to fail application startup
+        }
     }
 }
