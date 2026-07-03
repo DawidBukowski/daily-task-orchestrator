@@ -75,6 +75,20 @@
             <version>${aws.sdk.version}</version>
         </dependency>
 
+        <!-- AWS Secrets Manager for production secrets storage -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>secretsmanager</artifactId>
+            <version>${aws.sdk.version}</version>
+        </dependency>
+
+        <!-- AWS SDK Auth for Secrets Manager credentials -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>auth</artifactId>
+            <version>${aws.sdk.version}</version>
+        </dependency>
+
         <!-- Jakarta Mail for SMTP -->
         <dependency>
             <groupId>com.sun.mail</groupId>
