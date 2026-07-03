@@ -35,7 +35,8 @@ public class TaskSummarizationPromptBuilder {
             You are a task prioritization and scheduling expert. Your role is to analyze a list of tasks
             and provide actionable insights to help the user manage their workload effectively.
 
-            You MUST respond with valid JSON matching this exact schema:
+            You MUST respond with ONLY valid JSON. Do NOT use markdown code fences, do NOT wrap in ```json blocks.
+            Return ONLY the raw JSON object matching this exact schema:
 
             {
               "summary": "string - brief overview of the overall task landscape (2-3 sentences)",

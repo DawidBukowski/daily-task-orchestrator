@@ -196,3 +196,114 @@ Export the credentials before running the application:
 ```bash
 export GMAIL_CLIENT_ID="your-client-id"
 export GMAIL_CLIENT_SECRET="your-client-secret"
+```
+
+---
+
+## Email Notification Setup
+
+The Daily Task Orchestrator sends HTML-formatted task summaries to your email inbox via Gmail SMTP.
+
+### Quick Start
+
+**Required Environment Variables:**
+```bash
+export EMAIL_SMTP_HOST=smtp.gmail.com
+export EMAIL_SMTP_PORT=587
+export EMAIL_USERNAME=your-email@gmail.com
+export EMAIL_PASSWORD=your-gmail-app-password
+export EMAIL_FROM=your-email@gmail.com
+export EMAIL_TO=recipient@gmail.com
+```
+
+**Optional Settings (with defaults):**
+```bash
+export EMAIL_ENABLE_TLS=true      # Enable STARTTLS encryption
+export EMAIL_ENABLE_AUTH=true     # Enable SMTP authentication
+export EMAIL_TIMEOUT_MS=30000     # Connection timeout (30 seconds)
+```
+
+### Gmail App Password Setup
+
+Gmail requires an **App Password** for SMTP access (not your regular Gmail password).
+
+**Prerequisites:**
+1. Enable 2-Factor Authentication on your Gmail account
+2. Generate a Gmail App Password
+
+**Step-by-Step Guide:**
+
+1. **Enable 2-Factor Authentication:**
+   - Visit [Google Account Security](https://myaccount.google.com/security)
+   - Find "2-Step Verification" → Turn on
+   - Follow phone verification steps
+
+2. **Generate App Password:**
+   - Visit [Google App Passwords](https://myaccount.google.com/apppasswords)
+   - Select "Mail" and "Other (Custom name)"
+   - Name: "Daily Task Orchestrator"
+   - Click "Generate"
+   - Copy the 16-character password (e.g., `abcd efgh ijkl mnop`)
+   - **Remove all spaces:** `abcdefghijklmnop`
+
+3. **Set Environment Variable:**
+   ```bash
+   export EMAIL_PASSWORD=abcdefghijklmnop  # No spaces!
+   ```
+
+### Email Features
+
+**What you'll receive:**
+- **Subject:** "Daily Task Summary: X task(s)" or "⚠️ Daily Task Summary: X task(s) (Y overdue)"
+- **Priority Color Coding:**
+  - 🔴 CRITICAL - Red badge with white text
+  - 🟠 HIGH - Orange badge with white text
+  - 🟡 MEDIUM - Yellow badge with dark text
+  - 🟢 LOW - Green badge with dark text
+- **Overdue Warnings:** Red "⚠️ OVERDUE" text for past-due tasks
+- **Gmail Links:** Click to open original email in Gmail
+- **AI Recommendations:** Green-bordered section with actionable insights
+- **Responsive Design:** Works on desktop, mobile, and tablet
+
+### Testing Your Email Setup
+
+```bash
+# Build the project
+mvn clean package
+
+# Run with email notifications enabled
+java -jar target/daily-task-orchestrator.jar
+```
+
+**Expected console output:**
+```
+INFO  c.d.core.config.AppConfig - Email notifier initialized: SMTP smtp.gmail.com:587, recipient: recipient@gmail.com
+INFO  c.d.adapters.notifiers.EmailTaskNotifier - Generating email for 5 tasks
+INFO  c.d.adapters.notifiers.SmtpEmailSender - Email sent to recipient@gmail.com
+INFO  c.d.adapters.notifiers.EmailTaskNotifier - Email notification sent successfully
+```
+
+### Troubleshooting
+
+**"Authentication failed (535 error)":**
+- Verify App Password has no spaces: `abcdefghijklmnop`
+- Ensure 2-Factor Authentication is enabled
+- Regenerate App Password if unsure
+
+**"Email not received":**
+- Check spam/promotions folders
+- Verify `EMAIL_TO` environment variable is set
+- Check application logs for error messages
+
+**"Timeout error":**
+- Increase timeout: `export EMAIL_TIMEOUT_MS=60000`
+- Check firewall rules (port 587 must be open)
+- Try alternate port: `export EMAIL_SMTP_PORT=465` (SSL)
+
+### Complete Email Documentation
+
+For detailed setup instructions, troubleshooting, security best practices, and alternative SMTP providers, see:
+
+**[docs/EMAIL_SETUP.md](docs/EMAIL_SETUP.md)** - Comprehensive email notification setup guide
+
+---

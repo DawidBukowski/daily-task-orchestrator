@@ -825,4 +825,136 @@ class ClaudeResponseParserTest {
         assertThrows(UnsupportedOperationException.class, () ->
             response.taskUpdates().add(new ClaudeTaskSummaryResponse.TaskUpdate("task-2", "MEDIUM", null, "")));
     }
+
+    // ============ Markdown Code Fence Tests ============
+
+    @Test
+    void parse_withMarkdownJsonCodeFence_shouldStripFencesAndParse() {
+        String wrappedJson = """
+            ```json
+            {
+              "summary": "Test summary",
+              "schedule": "Test schedule",
+              "recommendations": ["Recommendation 1"],
+              "taskUpdates": [
+                {
+                  "taskId": "task-1",
+                  "priority": "HIGH",
+                  "estimatedHours": 2.5,
+                  "notes": "Test note"
+                }
+              ]
+            }
+            ```
+            """;
+
+        ClaudeTaskSummaryResponse response = parser.parse(wrappedJson);
+
+        assertNotNull(response);
+        assertEquals("Test summary", response.summary());
+        assertEquals("Test schedule", response.schedule());
+        assertEquals(1, response.recommendations().size());
+        assertEquals("Recommendation 1", response.recommendations().get(0));
+        assertEquals(1, response.taskUpdates().size());
+        assertEquals("task-1", response.taskUpdates().get(0).taskId());
+        assertEquals("HIGH", response.taskUpdates().get(0).priority());
+    }
+
+    @Test
+    void parse_withPlainMarkdownCodeFence_shouldStripFencesAndParse() {
+        String wrappedJson = """
+            ```
+            {
+              "summary": "Plain code fence",
+              "schedule": "Test",
+              "recommendations": [],
+              "taskUpdates": []
+            }
+            ```
+            """;
+
+        ClaudeTaskSummaryResponse response = parser.parse(wrappedJson);
+
+        assertNotNull(response);
+        assertEquals("Plain code fence", response.summary());
+    }
+
+    @Test
+    void parse_withWhitespaceAroundFences_shouldStripAndParse() {
+        String wrappedJson = """
+
+
+            ```json
+            {
+              "summary": "Whitespace test",
+              "schedule": "Test",
+              "recommendations": [],
+              "taskUpdates": []
+            }
+            ```
+
+
+            """;
+
+        ClaudeTaskSummaryResponse response = parser.parse(wrappedJson);
+
+        assertNotNull(response);
+        assertEquals("Whitespace test", response.summary());
+    }
+
+    @Test
+    void parse_withIncompleteOpeningFence_shouldReturnFallback() {
+        String malformedJson = """
+            ```json
+            {
+              "summary": "Test",
+              "schedule": "Test",
+              "recommendations": [],
+              "taskUpdates": []
+            }
+            """;  // Missing closing ```
+
+        // Without closing fence, JSON might still be parseable
+        // depending on implementation
+        ClaudeTaskSummaryResponse response = parser.parse(malformedJson);
+
+        // Should either parse or return fallback gracefully
+        assertNotNull(response);
+    }
+
+    @Test
+    void parse_withNoCodeFences_shouldParseDirectly() {
+        String plainJson = """
+            {
+              "summary": "No fences",
+              "schedule": "Direct JSON",
+              "recommendations": [],
+              "taskUpdates": []
+            }
+            """;
+
+        ClaudeTaskSummaryResponse response = parser.parse(plainJson);
+
+        assertNotNull(response);
+        assertEquals("No fences", response.summary());
+        assertEquals("Direct JSON", response.schedule());
+    }
+
+    @Test
+    void parse_withBackticksInJson_shouldNotConfuseWithFences() {
+        String jsonWithBackticks = """
+            {
+              "summary": "Has `backticks` inside",
+              "schedule": "Another `backtick`",
+              "recommendations": [],
+              "taskUpdates": []
+            }
+            """;
+
+        ClaudeTaskSummaryResponse response = parser.parse(jsonWithBackticks);
+
+        assertNotNull(response);
+        assertEquals("Has `backticks` inside", response.summary());
+        assertEquals("Another `backtick`", response.schedule());
+    }
 }

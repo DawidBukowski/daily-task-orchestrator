@@ -89,10 +89,7 @@ public class AppConfig {
             }
             case AWS_BEDROCK -> {
                 logger.info("Using AWS Bedrock API client (region: {})", config.getAwsRegion());
-                // TODO: Re-enable when AWS SDK dependency is added
-                // yield new AwsBedrockClaudeClient(config);
-                logger.warn("AWS Bedrock client not available, falling back to DirectAnthropicClient");
-                yield new DirectAnthropicClient(config);
+                yield new AwsBedrockClaudeClient(config);
             }
         };
     }

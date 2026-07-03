@@ -57,6 +57,7 @@ public class ClaudeResponseParser {
      *
      * <p>This method implements a multi-stage parsing strategy:
      * <ol>
+     *   <li>Strip markdown code fences (if present)</li>
      *   <li>Parse raw JSON into tree structure</li>
      *   <li>Extract and validate top-level fields</li>
      *   <li>Parse task updates array with per-item validation</li>
@@ -82,7 +83,10 @@ public class ClaudeResponseParser {
         }
 
         try {
-            JsonNode rootNode = objectMapper.readTree(jsonResponse);
+            // Strip markdown code fences if present (Claude sometimes wraps JSON in ```json ... ```)
+            String cleanedJson = stripMarkdownCodeFences(jsonResponse);
+
+            JsonNode rootNode = objectMapper.readTree(cleanedJson);
 
             // Extract top-level fields with null-safety
             String summary = extractTextField(rootNode, "summary", "No summary");
@@ -109,6 +113,49 @@ public class ClaudeResponseParser {
             logger.error("Unexpected error parsing response: {}", e.getMessage(), e);
             return ClaudeTaskSummaryResponse.createFallback();
         }
+    }
+
+    /**
+     * Strips markdown code fences from response text.
+     *
+     * <p>Claude sometimes wraps JSON responses in markdown code blocks like:
+     * <pre>
+     * ```json
+     * {"key": "value"}
+     * ```
+     * </pre>
+     *
+     * This method removes those fences, returning just the JSON content.
+     *
+     * @param response the raw response text (potentially with code fences)
+     * @return the cleaned JSON string without markdown formatting
+     */
+    private String stripMarkdownCodeFences(String response) {
+        String trimmed = response.trim();
+
+        // Check if wrapped in code fences
+        if (trimmed.startsWith("```")) {
+            // Find the end of the opening fence (first newline after ```)
+            int firstNewline = trimmed.indexOf('\n');
+            if (firstNewline == -1) {
+                // No newline found, return as-is
+                return response;
+            }
+
+            // Check if response ends with closing ```
+            int closingFence = trimmed.lastIndexOf("```");
+            if (closingFence <= firstNewline) {
+                // No proper closing fence, return as-is
+                return response;
+            }
+
+            // Extract content between fences
+            String content = trimmed.substring(firstNewline + 1, closingFence).trim();
+            logger.debug("Stripped markdown code fences from response");
+            return content;
+        }
+
+        return response;
     }
 
     /**
