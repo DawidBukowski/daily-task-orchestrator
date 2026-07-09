@@ -1,56 +1,192 @@
-Ten kod to **"strażnik kluczy"** dla Twojej aplikacji. Jego zadaniem jest uzyskanie pozwolenia od użytkownika na dostęp do jego konta Gmail, a następnie bezpieczne przechowywanie tego "pozwolenia", aby Twoja aplikacja mogła czytać lub wysyłać e-maile w imieniu użytkownika bez konieczności ciągłego podawania przez niego hasła.
+## 1. Zmienne statyczne i pola klasy
 
-### Jak działa ten proces krok po kroku?
+```java
+private static final Logger logger = Logger.getLogger(GmailOAuth2Handler.class.getName());
+private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
+```
 
-Wyobraź sobie, że chcesz wejść do strzeżonego budynku (Gmail API). Zamiast dawać Ci klucze główne (hasło użytkownika), system wydaje Ci specjalną kartę dostępu (token).
-
-#### 1. Przygotowanie (Konfiguracja)
-
-- **`GoogleClientSecrets`**: Aplikacja mówi: "Jestem zarejestrowana u Google jako aplikacja o nazwie X". Używa do tego `ClientId` i `ClientSecret` pobranych z konfiguracji.
+- **`Logger`**: Służy do zapisywania informacji o działaniu programu (logowania). Zamiast używać `System.out.println()`, używamy loggera, aby móc określać poziom ważności (np. INFO, WARNING, SEVERE).
     
-- **`FileDataStoreFactory`**: To miejsce, gdzie aplikacja zapisuje otrzymany "token" (kartę dostępu) na dysku, aby nie trzeba było pytać o zgodę przy każdym uruchomieniu programu.
-#### 2. Rozpoczęcie przepływu (Flow)
+- **`JSON_FACTORY`**: Biblioteki Google API komunikują się w formacie JSON. Tutaj używamy `GsonFactory`, co oznacza, że do przetwarzania tych danych klasa używa popularnej biblioteki Gson (od Google). Zmienna jest stała (`static final`), by nie tworzyć jej wielokrotnie w pamięci.
 
-- **`GoogleAuthorizationCodeFlow`**: To silnik całego procesu. Definiuje on, jakie uprawnienia chcemy uzyskać (np. tylko odczyt poczty, wysyłanie e-maili – to jest w `config.getScopes()`).
+```java
+private final GmailConfiguration config;
+private final NetHttpTransport httpTransport;
+private final boolean isLambdaExecution;
+```
+
+- **`config`**: To obiekt Twojej innej klasy, która przechowuje konfigurację (np. Client ID, Client Secret, jakich uprawnień wymaga aplikacja).
     
-- **`LocalServerReceiver`**: To sprytny trik. Aby otrzymać token, Google musi odesłać kod autoryzacyjny do Twojej aplikacji. Klasa ta uruchamia na chwilę mały serwer na Twoim komputerze (na porcie 8888), który "łapie" ten kod po tym, jak użytkownik zaloguje się w przeglądarce.
-#### 3. Autoryzacja
-
-- **`AuthorizationCodeInstalledApp`**: To "[[Interfaces]]" dla użytkownika. Otwiera przeglądarkę, w której użytkownik loguje się do swojego Gmaila i klika przycisk "Zezwól".
-#### 4. Zarządzanie tokenami
-
-To najważniejsza część dla stabilności programu:
-
-- **`Access Type: offline`**: Dzięki temu Google wysyła nie tylko krótki dostęp (`AccessToken`), ale także `RefreshToken`.
+- **`httpTransport`**: Obiekt odpowiedzialny za fizyczne wysyłanie żądań HTTP przez sieć. Biblioteki Google tego wymagają.
     
-- **Co to daje?** `AccessToken` wygasa bardzo szybko (np. po godzinie). `RefreshToken` pozwala aplikacji automatycznie pobrać nowy dostęp bez angażowania użytkownika. Kod sprawdza, czy token jest ważny, a jeśli nie – automatycznie go odświeża (`credential.refreshToken()`).
-
-
-| Komponent            | Rola                                                                                  |
-| -------------------- | ------------------------------------------------------------------------------------- |
-| GmailConfiguration   | Zewnętrzne źródło Twoich haseł i ID aplikacji.                                        |
-| Credential           | To Twój "cyfrowy paszport" – zawiera tokeny potrzebne do każdego zapytania do Gmaila. |
-| LocalServerReceiver  | Pozwala aplikacji "porozmawiać" z przeglądarką i odebrać zgodę użytkownika.           |
-| FileDataStoreFactory | "Sejf" na dysku, w którym trzymasz klucze, żeby nie prosić o nie za każdym razem.     |
-###  `AuthorizationCodeInstalledApp` – "Kierowca" (Logika procesu)
-
-To jest klasa nadrzędna, która zarządza **całym procesem autoryzacji**. Możesz o niej myśleć jak o orkiestrze.
-
-- **Co robi:** Wie, kiedy zacząć proces, wie jak poprosić `flow` o wygenerowanie URL-a do logowania i – co najważniejsze – **wie, jak otworzyć przeglądarkę** na komputerze użytkownika.
+- **`isLambdaExecution`**: Zmienna typu prawda/fałsz (boolean). Mówi programowi, czy został uruchomiony w chmurze AWS Lambda, czy u Ciebie na komputerze.
     
-- **Jej rola:** To ona mówi: "Hej, użytkowniku, otwórz przeglądarkę pod tym adresem, żeby się zalogować". Nie przejmuje się tym, co stanie się potem – ona po prostu inicjuje kontakt z człowiekiem.
+## 2. Konstruktor (Inicjalizacja)
+
+```java
+public GmailOAuth2Handler(GmailConfiguration config, NetHttpTransport httpTransport) {
+    this.config = config;
+    this.httpTransport = httpTransport;
+    this.isLambdaExecution = "lambda".equalsIgnoreCase(System.getenv("DEPLOYMENT_ENV"));
+
+    logger.info("GmailOAuth2Handler initialized in " +
+               (isLambdaExecution ? "LAMBDA" : "LOCAL") + " mode");
+}
+```
+
+Kiedy tworzysz obiekt tej klasy (używasz `new GmailOAuth2Handler(...)`), uruchamia się ten blok:
+
+- Pola klasy są uzupełniane danymi, które przekazujesz w parametrach.
+    
+- **Magia dzieje się w 4 linijce:** `System.getenv("DEPLOYMENT_ENV")` zagląda do zmiennych środowiskowych systemu operacyjnego. Jeśli znajdzie tam zmienną o nazwie `DEPLOYMENT_ENV` i jej wartość to `lambda`, zmienna `isLambdaExecution` ustawi się na `true`. Jeśli nie, będzie `false`. Dzięki temu program sam wie, gdzie się znajduje.
+    
+## 3. Główna metoda: `authenticate()`
+
+Ta metoda zwraca obiekt `Credential`, który jest dla Google jak "dowód osobisty". Aplikacja pokazuje go Google i mówi: "Hej, to ja, mam uprawnienia, żeby czytać/wysyłać maile tego użytkownika".
+
+### Przygotowanie danych do Google
+
+```java
+GoogleClientSecrets.Details details = new GoogleClientSecrets.Details();
+details.setClientId(config.getClientId());
+details.setClientSecret(config.getClientSecret());
+
+GoogleClientSecrets clientSecrets = new GoogleClientSecrets();
+clientSecrets.setInstalled(details);
+```
+
+- **Client ID i Client Secret**: To "login i hasło" samej aplikacji (nie użytkownika Gmaila, tylko Twojego programu). Uzyskujesz je w Google Cloud Console. Powinny być trzymane w tajemnicy (zwłaszcza Secret). Tutaj są pakowane w specjalny obiekt `GoogleClientSecrets`, którego wymaga biblioteka Google.
     
 
-###  `LocalServerReceiver` – "Słuchawka" (Techniczny odbiór)
+```java
+GoogleAuthorizationCodeFlow.Builder flowBuilder = new GoogleAuthorizationCodeFlow.Builder(
+        httpTransport, JSON_FACTORY, clientSecrets, config.getScopes())
+        .setAccessType("offline");
+```
 
-To jest specjalistyczne narzędzie, które `AuthorizationCodeInstalledApp` wykorzystuje do "złapania" odpowiedzi od Google.
-
-- **Co robi:** To **aktywny serwer**. W momencie, gdy użytkownik klika "Zezwól" w przeglądarce, Google wysyła odpowiedź (kod autoryzacyjny) nie bezpośrednio do Twojego głównego programu, ale pod adres `localhost:8888`.
+- **`flowBuilder`**: To kreator całego procesu logowania (OAuth2). Dostaje obiekt transportu HTTP, obsługę JSON, Twoje sekrety i `Scopes` (czyli zakres uprawnień, np. "tylko czytaj maile" albo "czytaj i wysyłaj").
     
-- **Jej rola:** Czeka w "ukryciu", aż przeglądarka odeśle informację zwrotną z Google. Gdy tylko otrzyma ten kod, przekazuje go z powrotem do `AuthorizationCodeInstalledApp`, aby ten mógł wymienić go na ostateczny `Credential` (token).
+- **`.setAccessType("offline")`**: **To krytyczna linijka.** Mówi Google: "Moja aplikacja będzie potrzebowała dostępu do konta, nawet gdy użytkownika nie będzie przy komputerze". Dzięki temu Google wyda nie tylko krótko żyjący _Access Token_ (ważny zazwyczaj godzinę), ale też _Refresh Token_ (który nie wygasa i pozwala aplikacji samej odnawiać _Access Token_).
+    
+### Ścieżka 1: Uruchomienie w AWS Lambda
 
-| Cecha              | AuthorizationCodeInstalledApp               | LocalServerReceiver                                             |
-| ------------------ | ------------------------------------------- | --------------------------------------------------------------- |
-| Główna rola        | Zarządzanie przepływem (flow).              | Odbieranie odpowiedzi od serwera Google.                        |
-| Interakcja         | Otwiera przeglądarkę (widzi ją użytkownik). | Uruchamia nasłuchiwanie na porcie (ukryte przed użytkownikiem). |
-| Kluczowe działanie | Wywołuje przeglądarkę.                      | "Łapie" kod z adresu URL po zalogowaniu.                        |
+```java
+if (isLambdaExecution) {
+    logger.info("Using SecretsManagerDataStoreFactory for token storage");
+    String awsRegion = System.getenv("AWS_REGION");
+    // ... sprawdzanie czy awsRegion nie jest pusty ...
+```
+
+Jeśli kod działa w AWS Lambda:
+
+- Ponieważ nie ma tu ekranu ani przeglądarki, nie możemy prosić użytkownika o kliknięcie "Zezwalam". Program musi pobrać wcześniej zapisany token z bezpiecznego miejsca.
+    
+
+```java
+    SecretsManagerClient secretsClient = SecretsManagerClient.builder()
+        .region(Region.of(awsRegion))
+        .credentialsProvider(DefaultCredentialsProvider.create())
+        .build();
+
+    flowBuilder.setDataStoreFactory(
+        new SecretsManagerDataStoreFactory(secretsClient, "daily-task-orchestrator")
+    );
+    GoogleAuthorizationCodeFlow flow = flowBuilder.build();
+```
+
+- Program łączy się z **AWS Secrets Manager** (to sejf chmurowy na hasła i tokeny).
+    
+- `SecretsManagerDataStoreFactory` mówi procesowi logowania: "Jeśli szukasz zapisanych tokenów, nie szukaj ich na dysku twardym, tylko połącz się z sejfem w AWS o nazwie `daily-task-orchestrator`".
+    
+
+```java
+    Credential credential = flow.loadCredential("user");
+    if (credential == null) {
+        throw new RuntimeException("No OAuth tokens found...");
+    }
+```
+
+- Program próbuje pobrać gotowy token dla identyfikatora `"user"`. Jeśli go nie ma w sejfie AWS, wyrzuca błąd. Dlaczego? Bo w chmurze Lambda program nie ma fizycznej możliwości samodzielnego wygenerowania nowego tokenu (potrzebna jest do tego przeglądarka internetowa na początku).
+
+
+```java
+    if (credential.getExpiresInSeconds() != null && credential.getExpiresInSeconds() < 60) {
+        logger.info("Token expired, refreshing...");
+        credential.refreshToken();
+    }
+    return credential;
+```
+
+- Zabezpieczenie: Jeśli token straci ważność za mniej niż minutę (60 sekund), program od razu go odświeża (wykorzystując _Refresh Token_ zdobyty wcześniej). Na koniec zwraca uprawnienia.
+    
+
+### Ścieżka 2: Uruchomienie lokalne (Na Twoim komputerze)
+
+```java
+} else {
+    logger.info("Using FileDataStoreFactory for token storage");
+    File tokenFolder = new File(config.getTokenDirectory());
+    // ... tworzenie folderu ...
+```
+
+Jeśli odpaliłeś ten kod na swoim komputerze (brak zmiennej środowiskowej "lambda"):
+
+- Aplikacja użyje `FileDataStoreFactory`, co oznacza, że zapisze i będzie odczytywać tokeny ze zwykłego folderu na Twoim dysku (np. w katalogu projektu).
+    
+
+```java
+    flowBuilder.setDataStoreFactory(new FileDataStoreFactory(tokenFolder));
+    GoogleAuthorizationCodeFlow flow = flowBuilder.build();
+```
+
+- Konfigurujemy proces, by patrzył na dysk, i budujemy przepływ autoryzacji (`flow`).
+    
+
+```java
+    LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
+    Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+```
+
+- **To najważniejszy moment logowania lokalnego.**
+    
+- `LocalServerReceiver` otwiera na Twoim komputerze mikro-serwer pod adresem `localhost:8888`.
+    
+- `AuthorizationCodeInstalledApp` automatycznie otwiera Twoją domyślną przeglądarkę internetową ze stroną logowania Google. Gdy się zalogujesz i zaakceptujesz uprawnienia, Google przekieruje Cię na adres `localhost:8888` razem z tajnym kodem.
+    
+- Z racji tego, że nasz `LocalServerReceiver` tam nasłuchuje, przejmuje ten kod, automatycznie wymienia go w tle z Google na _Access Token_ i _Refresh Token_, a na koniec zapisuje je do pliku we wcześniej zdefiniowanym folderze.
+    
+
+```java
+    if (credential.getRefreshToken() != null) {
+        logger.info("OAuth2 flow successful. Refresh token acquired and securely stored.");
+    } else if (credential.getExpiresInSeconds() != null && credential.getExpiresInSeconds() < 60) {
+        logger.info("Token expired, refreshing...");
+        credential.refreshToken();
+    }
+    return credential;
+}
+```
+
+- Sprawdzenie i zwrócenie obiektu, z którym reszta Twojej aplikacji może już swobodnie pobierać/wysyłać maile.
+    
+
+## 4. Obsługa błędów
+
+```java
+} catch (IOException e) {
+    logger.severe("Authentication failed due to network or IO error: " + e.getMessage());
+    throw new RuntimeException("Failed to authenticate with Gmail API", e);
+}
+```
+
+Cały kod owinięty jest w blok `try-catch`. Gdyby na jakimkolwiek etapie zabrakło internetu, dysk był zabezpieczony przed zapisem albo AWS odrzucił połączenie, zostanie rzucony wyjątek `IOException`. Klasa go przechwytuje, loguje informację o krytycznym błędzie (`logger.severe`), a następnie "ubija" aplikację rzucając `RuntimeException`, ponieważ bez uwierzytelnienia program i tak nie może kontynuować działania.
+
+## Podsumowanie procesu w praktyce
+
+Aby ta aplikacja działała poprawnie, deweloper robi następującą rzecz:
+
+1. Odpala kod na swoim komputerze (Local Mode). Otwiera się przeglądarka, loguje się, a program generuje tokeny i zapisuje je do pliku.
+    
+2. Deweloper bierze te tokeny z pliku i ręcznie wrzuca je do sejfu AWS (Secrets Manager).
+    
+3. Deweloper wgrywa kod do chmury (Lambda Mode). Od teraz Lambda sama co jakiś czas odświeża token komunikując się w tle z AWS Secrets Manager, bez żadnej ingerencji człowieka.
