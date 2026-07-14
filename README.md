@@ -307,3 +307,66 @@ For detailed setup instructions, troubleshooting, security best practices, and a
 **[docs/EMAIL_SETUP.md](docs/EMAIL_SETUP.md)** - Comprehensive email notification setup guide
 
 ---
+
+## AWS Lambda Deployment
+
+The Daily Task Orchestrator can be deployed to AWS Lambda for **automatic daily execution** at 9:00 AM via EventBridge scheduled events.
+
+### Quick Deployment Overview
+
+**Key Features:**
+- ☁️ Fully serverless - runs on AWS Lambda
+- 📅 Automatic scheduling via EventBridge (cron trigger)
+- 🔐 Secure credential storage in AWS Secrets Manager
+- 🤖 Claude AI integration via AWS Bedrock
+- 📧 Email notifications after each run
+- 💰 Estimated cost: ~$1.12/month (~$13/year)
+
+### Prerequisites
+
+- AWS Account with CLI configured
+- Java 21 and Maven 3.6+
+- Gmail OAuth tokens initialized locally
+- AWS Bedrock model access (Anthropic Claude)
+
+### Build Lambda Package
+
+```bash
+mvn clean package
+```
+
+**Output:** `target/daily-task-orchestrator-1.0.0-SNAPSHOT.jar` (~30 MB fat JAR)
+
+### Deployment Steps
+
+1. **Create AWS Secrets Manager secrets** for app config and Gmail tokens
+2. **Initialize Gmail OAuth tokens locally**, then upload to Secrets Manager
+3. **Create IAM role** with permissions for Secrets Manager, Bedrock, CloudWatch
+4. **Deploy Lambda function** with handler: `com.dailytask.lambda.DailyTaskLambdaHandler::handleRequest`
+5. **Configure EventBridge rule** with cron expression: `cron(0 9 * * ? *)`
+6. **Test deployment** with manual Lambda invocation
+
+### Environment Variables (Lambda)
+
+```bash
+DEPLOYMENT_ENV=lambda     # Triggers AWS Secrets Manager mode
+AWS_REGION=us-east-1      # Region for Secrets Manager and Bedrock
+```
+
+All other configuration (Gmail credentials, Claude settings, email config) is stored in **AWS Secrets Manager** under:
+- `daily-task-orchestrator/app-config` - JSON with all env vars
+- `daily-task-orchestrator/gmail-tokens` - OAuth tokens for Gmail API
+
+### Testing Locally with SAM CLI
+
+```bash
+sam local invoke DailyTaskFunction --event events/scheduled-event.json
+```
+
+### Complete Deployment Guide
+
+For step-by-step instructions on AWS infrastructure setup, IAM permissions, EventBridge configuration, monitoring, and troubleshooting, see:
+
+**[docs/06_AWS_Deployment/DEPLOYMENT_GUIDE.md](docs/06_AWS_Deployment/DEPLOYMENT_GUIDE.md)** - Comprehensive AWS Lambda deployment guide
+
+---

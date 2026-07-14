@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Daily Task Orchestrator - AWS Lambda Deployment Template
+
+Resources:
+  DailyTaskFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: daily-task-orchestrator
+      Description: Automated daily task orchestration with Gmail and Claude AI integration
+      CodeUri: target/daily-task-orchestrator-1.0.0-SNAPSHOT.jar
+      Handler: com.dailytask.lambda.DailyTaskLambdaHandler::handleRequest
+      Runtime: java21
+      MemorySize: 1024
+      Timeout: 300
+      Environment:
+        Variables:
+          DEPLOYMENT_ENV: lambda
+          AWS_REGION: us-east-1
+      Events:
+        DailySchedule:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 9 * * ? *)
+            Description: Trigger daily at 9:00 AM UTC
+            Enabled: true
+
+Outputs:
+  DailyTaskFunctionArn:
+    Description: ARN of the Daily Task Orchestrator Lambda function
+    Value: !GetAtt DailyTaskFunction.Arn
+  DailyTaskFunctionName:
+    Description: Name of the Lambda function
+    Value: !Ref DailyTaskFunction

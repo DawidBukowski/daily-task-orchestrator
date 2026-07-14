@@ -732,3 +732,31 @@ When contributing Claude-related changes:
 4. Use meaningful commit messages explaining the "why"
 5. Never skip hooks with `--no-verify`
 6. Keep secrets out of code and tests
+
+---
+
+## Project Phases Summary
+
+### ✅ Phase 1-5: Core Functionality (COMPLETED)
+- Gmail API integration with OAuth2
+- Task parsing and extraction
+- Claude AI integration (Anthropic API + AWS Bedrock)
+- Email notifications with SMTP
+- Local execution workflow
+
+### ✅ Phase 6: AWS Lambda Deployment (COMPLETED)
+- **6a-6c:** Secrets management, AWS Secrets Manager integration, Gmail token storage
+- **6d:** Lambda handler (`DailyTaskLambdaHandler`), Maven Shade plugin for fat JAR
+- **Status:** Ready for AWS deployment - infrastructure setup pending (Phase 6e-6g)
+
+**Key Deliverables (Phase 6d):**
+- `DailyTaskLambdaHandler.java` - AWS Lambda entry point with EventBridge support
+- Fat JAR build (~30 MB) with all dependencies included
+- `template.yaml` - SAM CLI template for local testing
+- `events/scheduled-event.json` - Sample EventBridge event
+- Comprehensive deployment guide: `docs/06_AWS_Deployment/DEPLOYMENT_GUIDE.md`
+
+**Next Steps:**
+- Phase 6e: AWS infrastructure setup (IAM, Secrets Manager, Lambda function)
+- Phase 6f: EventBridge scheduling and monitoring
+- Phase 6g: Documentation finalization
