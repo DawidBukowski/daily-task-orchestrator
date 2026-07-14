@@ -1,6 +1,6 @@
-# AWS Deployment Scripts - Phase 6e
+# AWS Deployment Scripts - Phase 6e & 6f
 
-Automated deployment scripts for Daily Task Orchestrator Lambda function.
+Automated deployment scripts for Daily Task Orchestrator Lambda function with EventBridge scheduling.
 
 ## Prerequisites
 
@@ -57,6 +57,18 @@ This will:
 7. Test Lambda function execution
 
 **Total time:** ~5-10 minutes (depending on Gmail volume)
+
+## Complete Deployment with Scheduling
+
+To deploy AND configure scheduled execution:
+
+```bash
+cd /path/to/daily-task-orchestrator
+./scripts/aws-deployment/deploy-all.sh
+./scripts/aws-deployment/setup-eventbridge.sh
+```
+
+This will deploy the Lambda function and configure it to run automatically every day at 9:00 AM UTC.
 
 ## Individual Scripts
 
@@ -136,6 +148,25 @@ Uploads the token file from `tokens/StoredCredential` to AWS Secrets Manager sec
 
 **Expected Output:** `"SUCCESS"` response and task summary email received.
 
+### 7. Setup EventBridge Scheduling (Phase 6f)
+
+```bash
+./scripts/aws-deployment/setup-eventbridge.sh
+```
+
+- Creates EventBridge rule: `daily-task-orchestrator-9am`
+- Schedule: `cron(0 9 * * ? *)` - Daily at 9:00 AM UTC
+- Adds Lambda as target
+- Grants EventBridge permission to invoke Lambda
+- Configures CloudWatch log retention (30 days)
+
+**Idempotent:** Updates existing rule if already present.
+
+**Post-Setup:**
+- Lambda runs automatically every day at 9:00 AM UTC
+- Check email daily for task summary
+- Monitor CloudWatch logs for execution status
+
 ## Troubleshooting
 
 ### IAM Role Issues
@@ -206,6 +237,37 @@ mvn clean package
 - Increase memory in `deploy-lambda.sh` (current: 1024 MB)
 - Recommended: 1536 MB for large email volumes
 
+### EventBridge Scheduling Issues
+
+**Error:** Rule exists but Lambda not triggered
+- Verify rule is ENABLED:
+  ```bash
+  aws events describe-rule --name daily-task-orchestrator-9am --region us-east-1
+  ```
+- Check Lambda has EventBridge permission:
+  ```bash
+  aws lambda get-policy --function-name daily-task-orchestrator --region us-east-1
+  ```
+- Re-run setup-eventbridge.sh to fix permissions
+
+**Error:** Need to change schedule time
+- Edit `SCHEDULE_EXPRESSION` in `setup-eventbridge.sh`
+- Re-run the script to update the rule
+- Example schedules:
+  - `cron(0 8 * * ? *)` - 8:00 AM UTC
+  - `cron(30 12 * * ? *)` - 12:30 PM UTC
+  - `cron(0 0 * * MON *)` - Monday at midnight UTC
+
+**Want to disable scheduled execution temporarily:**
+```bash
+aws events disable-rule --name daily-task-orchestrator-9am --region us-east-1
+```
+
+**Want to re-enable:**
+```bash
+aws events enable-rule --name daily-task-orchestrator-9am --region us-east-1
+```
+
 ## AWS Resources Created
 
 | Resource | Name | Description |
@@ -215,7 +277,8 @@ mvn clean package
 | Secret | `daily-task-orchestrator/app-config` | Application configuration (JSON) |
 | Secret | `daily-task-orchestrator/gmail-tokens` | Gmail OAuth tokens |
 | Lambda Function | `daily-task-orchestrator` | Main Lambda function |
-| CloudWatch Log Group | `/aws/lambda/daily-task-orchestrator` | Lambda execution logs |
+| CloudWatch Log Group | `/aws/lambda/daily-task-orchestrator` | Lambda execution logs (30 day retention) |
+| EventBridge Rule | `daily-task-orchestrator-9am` | Scheduled trigger (9:00 AM UTC daily) |
 
 ## Cost Estimate
 
@@ -230,7 +293,7 @@ mvn clean package
 
 After successful deployment:
 
-1. **Configure EventBridge** for scheduled execution (Phase 6f)
+1. **Configure EventBridge** for scheduled execution (Phase 6f) - if not already done
    ```bash
    ./scripts/aws-deployment/setup-eventbridge.sh
    ```
@@ -240,22 +303,37 @@ After successful deployment:
    aws logs tail /aws/lambda/daily-task-orchestrator --follow
    ```
 
-3. **View Lambda function in AWS Console**
-   ```
-   https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions/daily-task-orchestrator
-   ```
+3. **View resources in AWS Console**
+   - Lambda: https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions/daily-task-orchestrator
+   - EventBridge: https://console.aws.amazon.com/events/home?region=us-east-1#/eventbus/default/rules/daily-task-orchestrator-9am
+   - CloudWatch: https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups
+
+4. **Verify first scheduled execution**
+   - Wait for 9:00 AM UTC
+   - Check email for task summary
+   - Review CloudWatch logs for execution status
 
 ## Cleanup (Undeploy)
 
 To remove all AWS resources:
 
 ```bash
+# Delete EventBridge rule
+aws events remove-targets --rule daily-task-orchestrator-9am --ids 1 --region us-east-1
+aws events delete-rule --name daily-task-orchestrator-9am --region us-east-1
+
+# Remove Lambda permission for EventBridge
+aws lambda remove-permission \
+  --function-name daily-task-orchestrator \
+  --statement-id EventBridgeInvoke-daily-task-orchestrator-9am \
+  --region us-east-1
+
 # Delete Lambda function
-aws lambda delete-function --function-name daily-task-orchestrator
+aws lambda delete-function --function-name daily-task-orchestrator --region us-east-1
 
 # Delete secrets
-aws secretsmanager delete-secret --secret-id daily-task-orchestrator/app-config --force-delete-without-recovery
-aws secretsmanager delete-secret --secret-id daily-task-orchestrator/gmail-tokens --force-delete-without-recovery
+aws secretsmanager delete-secret --secret-id daily-task-orchestrator/app-config --force-delete-without-recovery --region us-east-1
+aws secretsmanager delete-secret --secret-id daily-task-orchestrator/gmail-tokens --force-delete-without-recovery --region us-east-1
 
 # Detach and delete IAM policy
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
@@ -268,7 +346,7 @@ aws iam delete-policy --policy-arn arn:aws:iam::${ACCOUNT_ID}:policy/daily-task-
 aws iam delete-role --role-name daily-task-orchestrator-lambda-role
 
 # Delete CloudWatch log group
-aws logs delete-log-group --log-group-name /aws/lambda/daily-task-orchestrator
+aws logs delete-log-group --log-group-name /aws/lambda/daily-task-orchestrator --region us-east-1
 ```
 
 ## Support
