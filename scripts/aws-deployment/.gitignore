@@ -1,0 +1,7 @@
+# Ignore token files - contain sensitive OAuth credentials
+tokens/
+*.json
+*.log
+
+# Ignore temporary files created by scripts
+/tmp/

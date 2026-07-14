@@ -744,19 +744,33 @@ When contributing Claude-related changes:
 - Email notifications with SMTP
 - Local execution workflow
 
-### ✅ Phase 6: AWS Lambda Deployment (COMPLETED)
-- **6a-6c:** Secrets management, AWS Secrets Manager integration, Gmail token storage
-- **6d:** Lambda handler (`DailyTaskLambdaHandler`), Maven Shade plugin for fat JAR
-- **Status:** Ready for AWS deployment - infrastructure setup pending (Phase 6e-6g)
+### ✅ Phase 6d: Lambda Handler Implementation (COMPLETED)
+- Lambda handler (`DailyTaskLambdaHandler`) with EventBridge support
+- Maven Shade plugin for fat JAR build (~30 MB)
+- SAM CLI template for local testing
+- Comprehensive unit tests with 7 test methods
+- Deployment guide documentation
 
-**Key Deliverables (Phase 6d):**
-- `DailyTaskLambdaHandler.java` - AWS Lambda entry point with EventBridge support
-- Fat JAR build (~30 MB) with all dependencies included
-- `template.yaml` - SAM CLI template for local testing
-- `events/scheduled-event.json` - Sample EventBridge event
-- Comprehensive deployment guide: `docs/06_AWS_Deployment/DEPLOYMENT_GUIDE.md`
+### ✅ Phase 6e: AWS Infrastructure Setup (COMPLETED)
+- **Automated Deployment Scripts:** 7 bash scripts for complete AWS deployment
+- **IAM Setup:** Role and policy creation with CloudWatch, Secrets Manager, and Bedrock permissions
+- **Secrets Manager:** Automated creation of app-config and gmail-tokens secrets
+- **Token Initialization:** Automated Gmail OAuth flow with local execution
+- **Lambda Deployment:** Automated function creation/update with configuration
+- **Testing:** Automated Lambda invocation with CloudWatch log retrieval
+
+**Key Deliverables (Phase 6e):**
+- `scripts/aws-deployment/deploy-all.sh` - Complete one-command deployment
+- `scripts/aws-deployment/setup-iam.sh` - IAM role and policy setup
+- `scripts/aws-deployment/setup-secrets.sh` - Secrets Manager configuration
+- `scripts/aws-deployment/init-gmail-tokens.sh` - Gmail OAuth token initialization
+- `scripts/aws-deployment/upload-tokens.sh` - Token upload to Secrets Manager
+- `scripts/aws-deployment/deploy-lambda.sh` - Lambda function deployment
+- `scripts/aws-deployment/test-lambda.sh` - Lambda function testing
+- `scripts/aws-deployment/README.md` - Comprehensive script documentation
+
+**Status:** Ready for EventBridge scheduling (Phase 6f)
 
 **Next Steps:**
-- Phase 6e: AWS infrastructure setup (IAM, Secrets Manager, Lambda function)
-- Phase 6f: EventBridge scheduling and monitoring
-- Phase 6g: Documentation finalization
+- Phase 6f: EventBridge scheduling and monitoring setup
+- Phase 6g: Documentation finalization and end-to-end validation
