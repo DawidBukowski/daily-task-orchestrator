@@ -1,10 +1,12 @@
 # Daily Task Orchestrator
 
-A Java-based application for orchestrating and managing daily tasks efficiently.
+**Status:** Deployed on AWS Lambda | Runs daily at 9:00 AM UTC via EventBridge
+
+A Java-based application for orchestrating and managing daily tasks efficiently with AI-powered summarization.
 
 ## Overview
 
-Daily Task Orchestrator is a task management system designed to help you organize, schedule, and execute daily tasks with ease. Built with Java, it provides a robust and scalable solution for task automation and coordination.
+Daily Task Orchestrator is a task management system that automatically reads your Gmail inbox, analyzes tasks using Claude AI (via AWS Bedrock), and sends you a prioritized HTML email summary every morning. Built with Java 21 and deployed as a serverless AWS Lambda function.
 
 ## Features
 
@@ -19,6 +21,10 @@ Daily Task Orchestrator is a task management system designed to help you organiz
 - **[CLAUDE.md](CLAUDE.md)** - Complete guide for Claude integration setup, configuration, development guidelines, and agent dispatch protocol
 - **[docs/03_Claude/ARCHITECTURE.md](docs/03_Claude/ARCHITECTURE.md)** - Deep dive into hexagonal architecture, component relationships, Claude provider flow, and testing strategies
 - **[docs/03_Claude/TROUBLESHOOTING.md](docs/03_Claude/TROUBLESHOOTING.md)** - Common issues, solutions, error diagnosis, and quick reference
+
+### AWS Deployment Documentation
+- **[Deployment Guide](docs/06_AWS_Deployment/DEPLOYMENT_GUIDE.md)** - Complete AWS Lambda deployment instructions
+- **[Deployment Scripts](scripts/aws-deployment/README.md)** - Automated deployment script documentation
 
 ### Project Implementation Documentation
 - **[Phase 3 Implementation Summary](docs/00_Meta/PHASE3_IMPLEMENTATION_SUMMARY.md)** - Task domain model, normalization pipeline, deadline parsing (6 formats), title extraction

@@ -26,9 +26,14 @@ daily-task-orchestrator/
 │   │   └── config/           # Configuration classes
 │   ├── adapters/
 │   │   ├── analyzers/        # Claude clients, task extractors, parsers
-│   │   ├── datasources/      # Gmail API adapter
-│   │   └── notifiers/        # Email notification adapter
-│   └── Main.java             # Entry point
+│   │   ├── datasources/      # Gmail API adapter (OAuth2, SecretsManagerDataStore)
+│   │   ├── notifiers/        # Email notification adapter
+│   │   └── secrets/          # AWS Secrets Manager provider
+│   ├── lambda/               # AWS Lambda handler (DailyTaskLambdaHandler)
+│   └── Main.java             # Local entry point
+├── scripts/aws-deployment/   # AWS deployment automation (8 scripts)
+├── docs/06_AWS_Deployment/   # AWS deployment documentation
+├── template.yaml             # SAM CLI template
 ├── pom.xml                   # Maven build configuration
 ├── README.md                 # Quick start guide
 └── CLAUDE.md                 # This file
@@ -771,8 +776,20 @@ When contributing Claude-related changes:
 - `scripts/aws-deployment/test-lambda.sh` - Lambda function testing
 - `scripts/aws-deployment/README.md` - Comprehensive script documentation
 
-**Status:** Ready for EventBridge scheduling (Phase 6f)
+### ✅ Phase 6f: EventBridge Scheduling (COMPLETED)
+- **EventBridge Rule:** `daily-task-orchestrator-9am` with cron `(0 9 * * ? *)`
+- **Lambda Permission:** EventBridge allowed to invoke Lambda function
+- **CloudWatch Logs:** 30-day retention configured
+- **Setup Script:** `scripts/aws-deployment/setup-eventbridge.sh` - idempotent configuration
+
+### 🔄 Phase 6g: Documentation Finalization & End-to-End Validation (IN PROGRESS)
+- Token workflow documentation
+- Troubleshooting runbook (AWS operations focus)
+- End-to-end validation checklist
+- Production readiness review
+
+**Status:** Phase 6g in progress
 
 **Next Steps:**
-- Phase 6f: EventBridge scheduling and monitoring setup
-- Phase 6g: Documentation finalization and end-to-end validation
+- Phase 6g: Complete documentation and validation (current)
+- Phase 7: University Portal integration (future)
