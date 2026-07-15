@@ -695,6 +695,11 @@ with database persistence and streaming
 - **[docs/03_Claude/ARCHITECTURE.md](docs/03_Claude/ARCHITECTURE.md)** - Hexagonal architecture details
 - **[docs/03_Claude/TROUBLESHOOTING.md](docs/03_Claude/TROUBLESHOOTING.md)** - Common issues and solutions
 - **[docs/00_Meta/PHASE3_IMPLEMENTATION_SUMMARY.md](docs/00_Meta/PHASE3_IMPLEMENTATION_SUMMARY.md)** - Task domain model implementation
+- **[docs/06_AWS_Deployment/DEPLOYMENT_GUIDE.md](docs/06_AWS_Deployment/DEPLOYMENT_GUIDE.md)** - AWS Lambda deployment guide
+- **[docs/06_AWS_Deployment/GMAIL_TOKEN_WORKFLOW.md](docs/06_AWS_Deployment/GMAIL_TOKEN_WORKFLOW.md)** - OAuth2 token lifecycle
+- **[docs/06_AWS_Deployment/TROUBLESHOOTING_RUNBOOK.md](docs/06_AWS_Deployment/TROUBLESHOOTING_RUNBOOK.md)** - AWS operations troubleshooting
+- **[docs/06_AWS_Deployment/E2E_VALIDATION_CHECKLIST.md](docs/06_AWS_Deployment/E2E_VALIDATION_CHECKLIST.md)** - Post-deployment validation
+- **[docs/06_AWS_Deployment/PRODUCTION_READINESS.md](docs/06_AWS_Deployment/PRODUCTION_READINESS.md)** - Production readiness review
 
 ---
 
@@ -782,14 +787,13 @@ When contributing Claude-related changes:
 - **CloudWatch Logs:** 30-day retention configured
 - **Setup Script:** `scripts/aws-deployment/setup-eventbridge.sh` - idempotent configuration
 
-### 🔄 Phase 6g: Documentation Finalization & End-to-End Validation (IN PROGRESS)
-- Token workflow documentation
-- Troubleshooting runbook (AWS operations focus)
-- End-to-end validation checklist
-- Production readiness review
+### ✅ Phase 6g: Documentation Finalization & End-to-End Validation (COMPLETED)
+- **Token Workflow:** `docs/06_AWS_Deployment/GMAIL_TOKEN_WORKFLOW.md` — OAuth2 lifecycle documentation
+- **Troubleshooting Runbook:** `docs/06_AWS_Deployment/TROUBLESHOOTING_RUNBOOK.md` — 7 failure scenarios
+- **E2E Validation:** `docs/06_AWS_Deployment/E2E_VALIDATION_CHECKLIST.md` — post-deploy verification
+- **Production Readiness:** `docs/06_AWS_Deployment/PRODUCTION_READINESS.md` — security, costs, monitoring
 
-**Status:** Phase 6g in progress
+**Status:** AWS deployment complete. System production-ready.
 
 **Next Steps:**
-- Phase 6g: Complete documentation and validation (current)
-- Phase 7: University Portal integration (future)
+- Phase 7: University Portal integration (future — see `docs/00_Meta/ROADMAP.md`)
